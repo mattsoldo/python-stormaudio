@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Setup for anthemav module."""
+"""Setup for stormaudio module."""
 from setuptools import setup
 
 def readme():
@@ -8,13 +8,13 @@ def readme():
         return f.read()
 
 setup(
-    name='anthemav',
-    version='1.1.10',
-    author='David McNett',
-    author_email='nugget@macnugget.org',
-    url='https://github.com/nugget/python-anthemav',
+    name='stormaudio',
+    version='0.1',
+    author='Matthew Soldo',
+    author_email='matt@soldo.org',
+    url='https://github.com/mattsoldo/python-stormaudio',
     license="LICENSE",
-    packages=['anthemav'],
+    packages=['stormaudio'],
     scripts=[],
     description='Python API for controlling Anthem Receivers',
     long_description=readme(),
@@ -30,6 +30,6 @@ setup(
     zip_safe=True,
 
     entry_points={
-        'console_scripts': [ 'anthemav_monitor = anthemav.tools:monitor', ]
+        'console_scripts': [ 'stormaudio_monitor = stormaudio.tools:monitor', ]
     }
 )

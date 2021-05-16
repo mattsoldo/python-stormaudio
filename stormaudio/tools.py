@@ -3,7 +3,7 @@ import argparse
 import asyncio
 import logging
 
-import anthemav
+import stormaudio
 
 __all__ = ('console', 'monitor')
 
@@ -44,7 +44,7 @@ def console(loop, log):
 
     log.info('Connecting to Anthem AVR at %s:%i' % (host, port))
 
-    conn = yield from anthemav.Connection.create(
+    conn = yield from stormaudio.Connection.create(
         host=host, port=port, loop=loop, update_callback=log_callback)
 
     log.info('Power state is '+str(conn.protocol.power))

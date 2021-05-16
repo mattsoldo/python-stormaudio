@@ -1,15 +1,15 @@
-python-anthemav
+python-stormaudio
 ===============
 
 |Build Status| |GitHub release| |PyPI|
 
 This is a Python package to interface with
-`Anthem <http://www.anthemav.com>`__ AVM and MRX receivers and
+`Anthem <https://www.stormaudio.com>`__ AVM and MRX receivers and
 processors. It uses the asyncio library to maintain an object-based
 connection to the network port of the receiver with supporting methods
 and properties to poll and adjust the receiver settings.
 
-This package was created primarily to support an anthemav media_player
+This package was created primarily to support an Storm Audio media_player
 platform for the `Home Assistant <https://home-assistant.io/>`__
 automation platform but it is structured to be general-purpose and
 should be usable for other applications as well.
@@ -57,19 +57,19 @@ Installation
 
 You can, of course, just install the most recent release of this package
 using ``pip``. This will download the more rececnt version from
-`PyPI <https://pypi.python.org/pypi/anthemav>`__ and install it to your
+`PyPI <https://pypi.python.org/pypi/stormaudio>`__ and install it to your
 host.
 
 ::
 
-   pip install anthemav
+   pip install stormaudio
 
 If you want to grab the the development code, you can also clone this
 git repository and install from local sources:
 
 ::
 
-   cd python-anthemav
+   cd python-stormaudio
    pip install .
 
 And, as you probably expect, you can live the developer’s life by
@@ -77,7 +77,7 @@ working with the live repo and edit to your heart’s content:
 
 ::
 
-   cd python-anthemav
+   cd python-stormaudio
    pip install . -e
 
 Testing
@@ -86,13 +86,13 @@ Testing
 The package installs a command-line tool which will connect to your
 receiver, power it up, and then monitor all activity and changes that
 take place. The code for this console monitor is in
-``anthemav/tools.py`` and you can invoke it by simply running this at
+``stormaudio/tools.py`` and you can invoke it by simply running this at
 the command line with the appropriate IP and port number that matches
 your receiver and its configured port:
 
 ::
 
-   anthemav_monitor --host 10.0.0.100 --port 14999
+   stormaudio_monitor --host 10.0.0.100 --port 14999
 
 Helpful Commands
 ----------------
@@ -104,19 +104,17 @@ Helpful Commands
 Interesting Links
 -----------------
 
--  `Project Home <https://github.com/nugget/python-anthemav>`__
+-  `Project Home <https://github.com/mattsoldo/python-stormaudio>`__
 -  `API Documentation for Anthem Network
-   Protocol <http://www.anthemav.com/downloads/MRX-x20-AVM-60-IP-RS-232.xls>`__
-   (Excel Spreadsheet)
--  `Pictures of cats <http://imgur.com/r/cats>`__
+   Protocol <https://www.stormaudio.com/wp-content/uploads/2021/02/Stormaudio_isp_tcpip_api_protocol_fw4.0r0_v18.pdf>`__
+   (PDF)
 
 Credits
 -------
-
--  This package was written by David McNett.
+-  This package is based on python-antehmav by David McNett; modified for Storm Audio by Matthew Soldo.
 
    -  https://github.com/nugget
-   -  https://keybase.io/nugget
+   -  https://github.com/mattsoldo
 
 How can you help?
 -----------------
@@ -145,10 +143,3 @@ How can you help?
    ACLU <https://action.aclu.org/donate-aclu>`__,
    `EFF <https://supporters.eff.org/donate/>`__, or
    `EPIC <https://epic.org>`__ and let me know that you did.
-
-.. |Build Status| image:: https://travis-ci.org/nugget/python-anthemav.svg?branch=master
-   :target: https://travis-ci.org/nugget/python-anthemav
-.. |GitHub release| image:: https://img.shields.io/github/release/nugget/python-anthemav.svg
-   :target: https://github.com/nugget/python-anthemav/releases
-.. |PyPI| image:: https://img.shields.io/pypi/v/anthemav.svg
-   :target: https://pypi.python.org/pypi/anthemav

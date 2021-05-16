@@ -15,57 +15,62 @@ except AttributeError:
 ATTR_CORE = {'Z1POW', 'IDM'}
 
 LOOKUP = {}
-
-LOOKUP['Z1POW'] = {'description': 'Zone 1 Power',
-                   '0': 'Off', '1': 'On'}
-LOOKUP['FPB'] = {'description': 'Front Panel Brightness',
-                 '0': 'Off', '1': 'Low', '2': 'Medium', '3': 'High'}
-LOOKUP['Z1VOL'] = {'description': 'Zone 1 Volume'}
-LOOKUP['IDR'] = {'description': 'Region'}
-LOOKUP['IDM'] = {'description': 'Model'}
-LOOKUP['IDS'] = {'description': 'Software version'}
-LOOKUP['IDB'] = {'description': 'Software build date'}
-LOOKUP['IDH'] = {'description': 'Hardware version'}
-LOOKUP['IDN'] = {'description': 'MAC address'}
-LOOKUP['ECH'] = {'description': 'Tx status',
-                 '0': 'Off', '1': 'On'}
-LOOKUP['SIP'] = {'description': 'Standby IP control',
-                 '0': 'Off', '1': 'On'}
-LOOKUP['ICN'] = {'description': 'Active input count'}
-LOOKUP['Z1INP'] = {'description': 'Zone 1 current input'}
-LOOKUP['Z1MUT'] = {'description': 'Zone 1 mute',
-                   '0': 'Unmuted', '1': 'Muted'}
-LOOKUP['Z1ARC'] = {'description': 'Zone 1 ARC',
-                   '0': 'Off', '1': 'On'}
-LOOKUP['Z1VIR'] = {'description': 'Video input resolution',
-                   '0': 'No video', '1': 'Other', '2': '1080p60', '3': '1080p50',
-                   '4': '1080p24', '5': '1080i60', '6': '1080i50', '7': '720p60',
-                   '8': '720p50', '9': '576p50', '10': '576i50', '11': '480p60',
-                   '12': '480i60', '13': '3D', '14': '4K'}
-LOOKUP['Z1IRH'] = {'description': 'Active horizontal video resolution (pixels)'}
-LOOKUP['Z1IRV'] = {'description': 'Active vertical video resolution (pixels)'}
-LOOKUP['Z1AIC'] = {'description': 'Audio input channels',
-                   '0': 'No audio', '1': 'Other', '2': 'Mono (center channel)',
-                   '3': '2 channel', '4': '5.1 channel', '5': '6.1 channel',
-                   '6': '7.1 channel', '7': 'Atmos'}
-LOOKUP['Z1AIF'] = {'description': 'Audio input format',
-                   '0': 'No audio', '1': 'Analog', '2': 'PCM', '3': 'Dolby',
-                   '4': 'DSD', '5': 'DTS', '6': 'Atmos'}
-LOOKUP['Z1BRT'] = {'description': 'Audio input bitrate (kbps)'}
-LOOKUP['Z1SRT'] = {'description': 'Audio input sampling rate (hKz)'}
-LOOKUP['Z1AIN'] = {'description': 'Audio input name'}
-LOOKUP['Z1AIR'] = {'description': 'Audio input rate name'}
-LOOKUP['Z1ALM'] = {'description': 'Audio listening mode',
-                   '00': 'None', '01': 'AnthemLogic Movie', '02': 'AnthemLogic Music',
-                   '03': 'PLIIx Movie', '04': 'PLIIx Music', '05': 'Neo:6 Cinema',
-                   '06': 'Neo:6 Music', '07': 'All Channel Stereo',
-                   '08': 'All Channel Mono', '09': 'Mono', '10': 'Mono-Academy',
-                   '11': 'Mono (L)', '12': 'Mono (R)', '13': 'High Blend',
-                   '14': 'Dolby Surround', '15': 'Neo:X Cinema', '16': 'Neo:X Music'}
-LOOKUP['Z1DYN'] = {'description': 'Dolby digital dynamic range',
-                   '0': 'Normal', '1': 'Reduced', '2': 'Late Night'}
-LOOKUP['Z1DIA'] = {'description': 'Dolby digital dialog normalization (dB)'}
-
+LOOKUP['ssp.procstate'] = {'description': 'Processor Status'}
+LOOKUP['ssp.power'] = {'description': 'Power'}
+LOOKUP['ssp.version'] = {'description': 'Version Number'}
+LOOKUP['ssp.brand'] = {'description': 'Brand'}
+LOOKUP['ssp.msgstatus'] = {'description': 'Message Status Group',
+                            '0': '',
+                            '1': 'Backup parameters in progress',
+                            '2': 'Restore parameters in progress',
+                            '3': 'Selective parameters in progress',
+                            '4': 'Reset parameters in progress',
+                            '5': 'Firmware upgrade in progress',
+                            '6': 'Loading Dirac room calibration',
+                            '98': 'String Message',
+                            '99': ''}
+LOOKUP['ssp.input'] = {'description': 'Input'}
+LOOKUP['ssp.input.list'] = {'description': 'List all configured inputs'}
+LOOKUP['ssp.preset'] = {'description': 'Preset'}
+LOOKUP['ssp.surroundmode'] = {'description': 'Surround Mode'}
+LOOKUP['ssp.allowedmode'] = {'description': 'Active Surround Modes'}
+LOOKUP['ssp.speaker'] = {'description': 'Speaker Config ID'}
+LOOKUP['ssp.mute'] = {'description': 'Mute status'}
+LOOKUP['ssp.dim'] = {'description': 'Dim status'}
+LOOKUP['ssp.vol'] = {'description': 'Volume Level'}
+LOOKUP['ssp.bass'] = {'description': 'Bass Level'}
+LOOKUP['ssp.treb'] = {'description': 'Treble Level'}
+LOOKUP['ssp.brightness'] = {'description': 'Brightness Level'}
+LOOKUP['ssp.c_en'] = {'description': 'Center Enhance'}
+LOOKUP['ssp.s_en'] = {'description': 'Surround Enhance'}
+LOOKUP['ssp.lipsync'] = {'description': 'Lip Sync Level'}
+LOOKUP['ssp.sub_en'] = {'description': 'Subwoofer Enhance'}
+LOOKUP['ssp.aurostrength'] = {'description': 'Auro Strength'}
+LOOKUP['ssp.auropreset'] = {'description': 'Auro Preset',
+                            '0': 'Small',
+                            '1': 'Medium',
+                            '2': 'Large',
+                            '3': 'Speech'}
+LOOKUP['ssp.drc'] = {'description': 'DRC Status'}
+LOOKUP['ssp.cspread'] = {'description': 'Center Spread'}
+LOOKUP['ssp.dialogcontrol'] = {'description': 'Dialog Control'}
+LOOKUP['ssp.dialognorm'] = {'description': 'Dialog Norm'}
+LOOKUP['ssp.IMAXMode'] = {'description': 'IMAX Mode'}
+LOOKUP['ssp.spheraudioeffect'] = {'description': 'SphereAudio Effect',
+                            '0': 'ByPass',
+                            '1': 'Lounge',
+                            '2': 'Home Cinema',
+                            '3': 'Concert',
+                            '4': 'Cinema'}
+LOOKUP['ssp.lfedim'] = {'description': 'LFE Dim'}
+LOOKUP['ssp.zones.list'] = {'description': ''}
+LOOKUP['ssp.frontpanel.color'] = {'description': 'Front Panel Color'}
+LOOKUP['ssp.frontpanel.stbybright'] = {'description': 'Front Panel Standby Brightness'}
+LOOKUP['ssp.frontpanel.actbright'] = {'description': 'Front Panel Active Brightness'}
+LOOKUP['ssp.frontpanel.stbydelay'] = {'description': 'Front Panel Standby Delay'}
+LOOKUP['ssp.fs'] = {'description': 'Sample Rate'}
+LOOKUP['ssp.stream'] = {'description': 'Stream Type'}
+LOOKUP['ssp.format'] = {'description': 'Format Code'}
 
 # pylint: disable=too-many-instance-attributes, too-many-public-methods
 class AVR(asyncio.Protocol):
@@ -531,7 +536,7 @@ class AVR(asyncio.Protocol):
 
         When enabled, all commands, status changes, and control information
         are reported through the Ethernet and RS-232 connections.  Do not
-        disable this setting, the anthemav pacakge requires it.
+        disable this setting, the stormaudio pacakge requires it.
 
         It is explicitly set to True whenever this module connects to the AVR,
         but I'll still let you disable it though, because I believe in aiming

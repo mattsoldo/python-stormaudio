@@ -2,7 +2,7 @@
 
 import argparse
 import asyncio
-import anthemav
+import stormaudio
 import logging
 
 log = logging.getLogger(__name__)
@@ -29,9 +29,9 @@ def test():
     host = args.host
     port = int(args.port)
 
-    log.info('Connecting to Anthem AVR at %s:%i' % (host, port))
+    log.info('Connecting to Storm Audio ISP at %s:%i' % (host, port))
 
-    conn = yield from anthemav.Connection.create(host=host,port=port,loop=loop,update_callback=log_callback)
+    conn = yield from stormaudio.Connection.create(host=host,port=port,loop=loop,update_callback=log_callback)
 
     log.info('Power state is '+str(conn.protocol.power))
     conn.protocol.power = True

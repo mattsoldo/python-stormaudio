@@ -20,7 +20,7 @@ class Connection:
 
     @classmethod
     @asyncio.coroutine
-    def create(cls, host='localhost', port=14999,
+    def create(cls, host='stormaudio', port=23,
                auto_reconnect=True, loop=None, protocol_class=AVR,
                update_callback=None):
         """Initiate a connection to a specific device.
@@ -100,7 +100,7 @@ class Connection:
                 if self._halted:
                     yield from asyncio.sleep(2, loop=self._loop)
                 else:
-                    self.log.info('Connecting to Anthem AVR at %s:%d',
+                    self.log.info('Connecting to Storm Audio ISP at %s:%d',
                                   self.host, self.port)
                     yield from self._loop.create_connection(
                         lambda: self.protocol, self.host, self.port)
