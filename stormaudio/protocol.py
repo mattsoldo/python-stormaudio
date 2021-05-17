@@ -2,6 +2,7 @@
 import asyncio
 import logging
 import time
+import numbers
 
 __all__ = ('AVR')
 
@@ -15,7 +16,10 @@ except AttributeError:
 ATTR_CORE = {'Z1POW', 'IDM'}
 
 LOOKUP = {}
-LOOKUP['ssp.procstate'] = {'description': 'Processor Status'}
+LOOKUP['ssp.procstate'] = {'description': 'Processor Status',
+                            '0': 'Off',
+                            '1': 'Starting / Stopping',
+                            '2': 'On'}
 LOOKUP['ssp.power'] = {'description': 'Power'}
 LOOKUP['ssp.version'] = {'description': 'Version Number'}
 LOOKUP['ssp.brand'] = {'description': 'Brand'}
@@ -71,6 +75,7 @@ LOOKUP['ssp.frontpanel.stbydelay'] = {'description': 'Front Panel Standby Delay'
 LOOKUP['ssp.fs'] = {'description': 'Sample Rate'}
 LOOKUP['ssp.stream'] = {'description': 'Stream Type'}
 LOOKUP['ssp.format'] = {'description': 'Format Code'}
+LOOKUP['ssp.trig1'] = {'description': 'Trigger 1'}
 
 # pylint: disable=too-many-instance-attributes, too-many-public-methods
 class AVR(asyncio.Protocol):
@@ -108,8 +113,6 @@ class AVR(asyncio.Protocol):
 
         for key in LOOKUP:
             setattr(self, '_'+key, '')
-
-        self._Z1POW = '0'
 
     def refresh_core(self):
         """Query device for all attributes that exist regardless of power state.
@@ -200,7 +203,7 @@ class AVR(asyncio.Protocol):
         """
         self.transport.pause_reading()
 
-        for message in self.buffer.split(';'):
+        for message in self.buffer.split('\n'):
             if message != '':
                 self.log.debug('assembled message '+message)
                 self._parse_message(message)
@@ -231,25 +234,18 @@ class AVR(asyncio.Protocol):
         recognized = False
         newdata = False
 
-        if data.startswith('!I'):
-            self.log.warning('Invalid command: %s', data[2:])
-            recognized = True
-        elif data.startswith('!R'):
-            self.log.warning('Out-of-range command: %s', data[2:])
-            recognized = True
-        elif data.startswith('!E'):
-            self.log.warning('Cannot execute recognized command: %s', data[2:])
-            recognized = True
-        elif data.startswith('!Z'):
-            self.log.warning('Ignoring command for powered-off zone: %s', data[2:])
+        if data.startswith('ssp.zones'):
+            self.log.warning('Zones Control Unsupported : %s', data)
             recognized = True
         else:
-
             for key in LOOKUP:
                 if data.startswith(key):
                     recognized = True
 
-                    value = data[len(key):]
+                    # Value is the last item in string separated by dots 
+                    # don't split more than twice to account for decimal in volume
+                    value = data.split('.',2)[-1].strip('[]')
+                    print("Parsed Value {} for key {} with data {}".format(value, key, data))
                     oldvalue = getattr(self, '_'+key)
                     if oldvalue != value:
                         changeindicator = 'New Value'
@@ -274,35 +270,23 @@ class AVR(asyncio.Protocol):
 
                     setattr(self, '_'+key, value)
 
-                    if key == 'Z1POW' and value == '1' and oldvalue == '0':
+                    if key == 'ssp.power' and value == '1' and oldvalue == '0':
                         self.log.info('Power on detected, refreshing all attributes')
                         self._poweron_refresh_successful = False
                         self._loop.call_later(1, self.poweron_refresh)
 
-                    if key == 'Z1POW' and value == '0' and oldvalue == '1':
-                        self._poweron_refresh_successful = False
-
                     break
 
-        if data.startswith('ICN'):
-            self.log.warning('ICN update received')
-            recognized = True
-            self._populate_inputs(int(value))
+            # input_number = int(data[3:5])
+            # value = data[5:]
 
-        if data.startswith('ISN'):
-            recognized = True
-            self._poweron_refresh_successful = True
+            # oldname = self._input_names.get(input_number, '')
 
-            input_number = int(data[3:5])
-            value = data[5:]
-
-            oldname = self._input_names.get(input_number, '')
-
-            if oldname != value:
-                self._input_numbers[value] = input_number
-                self._input_names[input_number] = value
-                self.log.info('New Value: Input %d is called %s', input_number, value)
-                newdata = True
+            # if oldname != value:
+                # self._input_numbers[value] = input_number
+                # self._input_names[input_number] = value
+                # self.log.info('New Value: Input %d is called %s', input_number, value)
+                # newdata = True
 
         if newdata:
             if self._update_callback:
@@ -315,27 +299,25 @@ class AVR(asyncio.Protocol):
 
     def query(self, item):
         """Issue a raw query to the device for an item.
-
+        
+        Example: query('ssp.vol')
+ 
         This function is used to request that the device supply the current
-        state for a data item as described in the Anthem IP protocoal API.
-        Normal interaction with this module will not require you to make raw
-        device queries with this function, but the method is exposed in case
-        there's a need that's not otherwise met by the abstraction methods
-        defined elsewhere.
-
-        This function does not return the result, it merely issues the request.
-
-            :param item: Any of the data items from the API
-            :type item: str
-
-        :Example:
-
-        >>> query('Z1VOL')
-
+        state for a data item as described in the Storm Audio IP protocoal API.
         """
-        item = item+'?'
         self.command(item)
 
+    def set_value(self, command, value):
+        # If the value is one of the following
+        # then the command format is different
+        special_values = ['on','off','toggle','up','down']
+
+        if value in special_values:
+            command_to_send = '{}.{}\n'.format(command,value)
+        else:
+            command_to_send = '{}.[{}]\n'.format(command,value)
+        self.command(command_to_send.encode())
+    
     def command(self, command):
         """Issue a raw command to the device.
 
@@ -353,34 +335,13 @@ class AVR(asyncio.Protocol):
 
         >>> command('Z1VOL-50')
         """
-        command = command+';'
-        self.formatted_command(command)
-
-    def formatted_command(self, command):
-        """Issue a raw, formatted command to the device.
-
-        This function is invoked by both query and command and is the point
-        where we actually send bytes out over the network.  This function does
-        the wrapping and formatting required by the Anthem API so that the
-        higher-level function can just operate with regular strings without
-        the burden of byte encoding and terminating device requests.
-
-            :param command: Any command as documented in the Anthem API
-            :type command: str
-
-        :Example:
-
-        >>> formatted_command('Z1VOL-50')
-        """
-        command = command
-        command = command.encode()
-
         self.log.debug('> %s', command)
         try:
             self.transport.write(command)
             time.sleep(0.01)
         except:
             self.log.warning('No transport found, unable to send command')
+
 
     #
     # Volume and Attenuation handlers.  The Anthem tracks volume internally as
@@ -393,38 +354,6 @@ class AVR(asyncio.Protocol):
     #   - volume (0-100)
     #   - volume_as_percentage (0-1 floating point)
     #
-
-    def attenuation_to_volume(self, value):
-        """Convert a native attenuation value to a volume value.
-
-        Takes an attenuation in dB from the Anthem (-90 to 0) and converts it
-        into a normal volume value (0-100).
-
-            :param arg1: attenuation in dB (negative integer from -90 to 0)
-            :type arg1: int
-
-        returns an integer value representing volume
-        """
-        try:
-            return round((90.00 + int(value)) / 90 * 100)
-        except ValueError:
-            return 0
-
-    def volume_to_attenuation(self, value):
-        """Convert a volume value to a native attenuation value.
-
-        Takes a volume value and turns it into an attenuation value suitable
-        to send to the Anthem AVR.
-
-            :param arg1: volume (integer from 0 to 100)
-            :type arg1: int
-
-        returns a negative integer value representing attenuation in dB
-        """
-        try:
-            return round((value / 100) * 90) - 90
-        except ValueError:
-            return -90
 
     @property
     def attenuation(self):
@@ -439,17 +368,17 @@ class AVR(asyncio.Protocol):
         >>> attenuation = -50
         """
         try:
-            return int(self._Z1VOL)
+            return int(getattr(self,ssp.vol))
         except ValueError:
-            return -90
+            return -100
         except NameError:
-            return -90
+            return -100
 
     @attenuation.setter
     def attenuation(self, value):
-        if isinstance(value, int) and -90 <= value <= 0:
+        if isinstance(value, numbers.Number) and -100 < value <= 0:
             self.log.debug('Setting attenuation to '+str(value))
-            self.command('Z1VOL'+str(value))
+            self.set_value('ssp.vol',value)
 
     @property
     def volume(self):
@@ -463,12 +392,13 @@ class AVR(asyncio.Protocol):
         >>> volvalue = volume
         >>> volume = 20
         """
-        return self.attenuation_to_volume(self.attenuation)
+        return getattr(self, 'ssp.vol')
+        # return self.query(ssp.vol)
 
     @volume.setter
     def volume(self, value):
-        if isinstance(value, int) and 0 <= value <= 100:
-            self.attenuation = self.volume_to_attenuation(value)
+        if isinstance(value, int) and 0 <= value < 100:
+            self.set_value('ssp.vol',-1*value)
 
     @property
     def volume_as_percentage(self):
@@ -482,15 +412,12 @@ class AVR(asyncio.Protocol):
         >>> volper = volume_as_percentage
         >>> volume_as_percentage = 0.20
         """
-        volume_per = self.volume / 100
-        return volume_per
+        return (100 - self.volume) / 100
 
     @volume_as_percentage.setter
     def volume_as_percentage(self, value):
-        if isinstance(value, float) or isinstance(value, int):
-            if 0 <= value <= 1:
-                value = round(value * 100)
-                self.volume = value
+        if isinstance(value, number.Number) and 0 < value <= 1:
+            self.volume = 100*(1-value)
 
     #
     # Internal assistant functions for unified handling of boolean

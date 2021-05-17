@@ -10,8 +10,8 @@ log = logging.getLogger(__name__)
 @asyncio.coroutine
 def test():
     parser = argparse.ArgumentParser(description=test.__doc__)
-    parser.add_argument('--host', default='127.0.0.1', help='IP or FQDN of AVR')
-    parser.add_argument('--port', default='14999', help='Port of AVR')
+    parser.add_argument('--host', default='stormaudio', help='IP or FQDN of AVR')
+    parser.add_argument('--port', default='23', help='Port of AVR')
     parser.add_argument('--verbose', '-v', action='count')
 
     args = parser.parse_args()

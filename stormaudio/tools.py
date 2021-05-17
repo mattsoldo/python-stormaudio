@@ -22,8 +22,8 @@ def console(loop, log):
         Show debug logging.
     """
     parser = argparse.ArgumentParser(description=console.__doc__)
-    parser.add_argument('--host', default='127.0.0.1', help='IP or FQDN of AVR')
-    parser.add_argument('--port', default='14999', help='Port of AVR')
+    parser.add_argument('--host', default='stormaudio', help='IP or FQDN of AVR')
+    parser.add_argument('--port', default='23', help='Port of AVR')
     parser.add_argument('--verbose', '-v', action='count')
 
     args = parser.parse_args()
@@ -50,7 +50,7 @@ def console(loop, log):
     log.info('Power state is '+str(conn.protocol.power))
     conn.protocol.power = True
     log.info('Power state is '+str(conn.protocol.power))
-
+    log.info('Volume is {}'.format(str(conn.protocol.volume())))
     yield from asyncio.sleep(10, loop=loop)
 
     log.info('Panel brightness (raw) is '+str(conn.protocol.panel_brightness))
